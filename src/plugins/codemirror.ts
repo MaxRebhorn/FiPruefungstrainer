@@ -1,6 +1,6 @@
 import { EditorView } from "@codemirror/view";
 import { EditorState } from "@codemirror/state";
-import { basicSetup } from "@codemirror/basic-setup";
+import { basicSetup } from "codemirror";
 import { sql, SQLite } from "@codemirror/lang-sql";
 import { javascript } from "@codemirror/lang-javascript";
 
@@ -48,8 +48,16 @@ export function createCodeMirror(
     extensions,
   });
 
-  return new EditorView({
+  const view = new EditorView({
     state,
     parent: container,
   });
+
+  // dev-mode helper for e2e tests
+  if (import.meta.env.DEV) {
+    (window as any).__cmEditors = (window as any).__cmEditors || [];
+    (window as any).__cmEditors.push(view);
+  }
+
+  return view;
 }

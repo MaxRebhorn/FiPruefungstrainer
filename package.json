@@ -7,28 +7,32 @@
     "dev": "vite",
     "build": "vue-tsc --noEmit && vite build",
     "preview": "vite preview",
-    "test": "vitest"
+    "test": "vitest",
+    "test:e2e": "playwright test --config=e2e/playwright.config.ts"
   },
   "dependencies": {
-    "vue": "^3.3.0",
-    "vue-router": "^4.2.0",
-    "pinia": "^2.1.0",
-    "@codemirror/basic-setup": "^0.20.0",
-    "@codemirror/view": "^6.20.0",
-    "@codemirror/state": "^6.2.0",
-    "@codemirror/lang-sql": "^6.5.0",
     "@codemirror/lang-javascript": "^6.1.0",
+    "@codemirror/lang-sql": "^6.5.0",
+    "@codemirror/state": "^6.2.0",
+    "@codemirror/view": "^6.20.0",
+    "codemirror": "^6.0.2",
+    "date-fns": "^2.30.0",
     "marked": "^9.1.0",
+    "pinia": "^2.1.0",
     "sql.js": "^1.12.0",
-    "date-fns": "^2.30.0"
+    "vue": "^3.3.0",
+    "vue-router": "^4.2.0"
   },
   "devDependencies": {
-    "vite": "^5.4.0",
-    "@vitejs/plugin-vue": "^5.0.0",
-    "typescript": "^5.0.0",
+    "@playwright/test": "^1.60.0",
+    "@testing-library/vue": "^8.0.0",
     "@types/node": "^20.0.0",
-    "vue-tsc": "^2.0.0",
+    "@types/sql.js": "^1.4.11",
+    "@vitejs/plugin-vue": "^5.0.0",
+    "jsdom": "^29.1.1",
+    "typescript": "^5.0.0",
+    "vite": "^5.4.0",
     "vitest": "^1.0.0",
-    "@testing-library/vue": "^8.0.0"
+    "vue-tsc": "^2.0.0"
   }
 }
