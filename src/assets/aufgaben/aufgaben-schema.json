@@ -1,0 +1,345 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://example.com/fi-pruefungstrainer/aufgaben-schema.json",
+  "title": "FI Prüfungstrainer Aufgaben-Schema",
+  "description": "JSON-Schema für Aufgabensets des FI-Prüfungstrainers. Definiert das Format für SQL- und JavaScript-Übungsaufgaben zur IHK-Vorbereitung.",
+  "type": "object",
+  "required": ["gruppe", "aufgaben"],
+  "properties": {
+    "gruppe": {
+      "type": "object",
+      "description": "Metadaten zur Aufgabengruppe (z.B. Prüfungsszenario oder Thema).",
+      "required": ["id", "titel", "beschreibung"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Eindeutige ID der Gruppe (z.B. 'diakonie', 'industrie4'). Wird als Filterkriterium verwendet.",
+          "pattern": "^[a-z0-9_-]+$"
+        },
+        "titel": {
+          "type": "string",
+          "description": "Anzeigename der Gruppe (z.B. 'Industrie 4.0 – WaltherGrundig Technologie GmbH')."
+        },
+        "beschreibung": {
+          "type": "string",
+          "description": "Kurzbeschreibung des Gruppenthemas."
+        }
+      },
+      "additionalProperties": false
+    },
+    "aufgaben": {
+      "type": "array",
+      "description": "Liste der Aufgaben innerhalb dieser Gruppe.",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": [
+          "id", "typ", "schwierigkeit", "titel",
+          "kontext", "aufgabenstellung", "hinweise",
+          "loesung"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Eindeutige ID der Aufgabe (z.B. 'diakonie-1').",
+            "pattern": "^[a-z0-9_-]+$"
+          },
+          "typ": {
+            "type": "string",
+            "description": "Aufgabentyp: SQL-Query oder JavaScript-Funktion.",
+            "enum": ["sql", "javascript"]
+          },
+          "schwierigkeit": {
+            "type": "string",
+            "description": "Schwierigkeitsgrad der Aufgabe.",
+            "enum": ["leicht", "mittel", "schwer"]
+          },
+          "titel": {
+            "type": "string",
+            "description": "Kurztitel der Aufgabe (wird in der Aufgabenliste angezeigt)."
+          },
+          "beschreibung": {
+            "type": "string",
+            "description": "Einzeilige Zusammenfassung der Aufgabe (optional)."
+          },
+          "kontext": {
+            "type": "string",
+            "description": "Ausführlicher Szenario-Kontext – beschreibt die fiktive oder realitätsnahe Situation."
+          },
+          "aufgabenstellung": {
+            "type": "string",
+            "description": "Präzise Aufgabenstellung, was zu tun ist. Kann Markdown-Formatierung enthalten."
+          },
+          "hinweise": {
+            "type": "array",
+            "description": "Hilfreiche Tipps und Hinweise zur Lösung.",
+            "items": {
+              "type": "string"
+            },
+            "minItems": 1
+          },
+          "starterCode": {
+            "type": "string",
+            "description": "Code-Vorlage, die dem Nutzer im Editor angezeigt wird."
+          },
+          "schema": {
+            "type": "array",
+            "description": "SQL CREATE TABLE + INSERT Statements, um die Datenbank für diese Aufgabe aufzubauen. Nur bei SQL-Aufgaben gesetzt.",
+            "items": {
+              "type": "string"
+            }
+          },
+          "mocks": {
+            "type": "object",
+            "description": "Mock-Daten für JavaScript-Funktionen (optional).",
+            "additionalProperties": {
+              "type": "string"
+            }
+          },
+          "gruppe": {
+            "type": "string",
+            "description": "Referenz auf die Gruppen-ID. Ermöglicht Filterung nach Gruppe.",
+            "pattern": "^[a-z0-9_-]+$"
+          },
+          "loesung": {
+            "type": "object",
+            "description": "Lösungsdefinition mit Validierungslogik. Der Typ bestimmt, wie die Lösung geprüft wird.",
+            "required": ["typ"],
+            "oneOf": [
+              {
+                "title": "SELECT-Vergleich",
+                "description": "Vergleicht das Ergebnis einer SELECT-Abfrage mit einer Musterlösung.",
+                "required": ["typ", "musterloesung"],
+                "properties": {
+                  "typ": { "const": "select_compare" },
+                  "musterloesung": {
+                    "type": "string",
+                    "description": "Die korrekte SQL-Abfrage als Referenz."
+                  },
+                  "spaltenReihenfolgeIgnorieren": {
+                    "type": "boolean",
+                    "description": "Ob die Spaltenreihenfolge im Ergebnis ignoriert werden soll.",
+                    "default": false
+                  },
+                  "zeilenReihenfolgeIgnorieren": {
+                    "type": "boolean",
+                    "description": "Ob die Zeilenreihenfolge im Ergebnis ignoriert werden soll.",
+                    "default": false
+                  }
+                },
+                "additionalProperties": false
+              },
+              {
+                "title": "INSERT-Prüfung",
+                "description": "Prüft, ob Daten korrekt eingefügt wurden.",
+                "required": ["typ", "pruefQuery", "erwartet"],
+                "properties": {
+                  "typ": { "const": "insert_check" },
+                  "pruefQuery": {
+                    "type": "string",
+                    "description": "SQL-Abfrage, die die eingefügten Daten prüft."
+                  },
+                  "erwartet": {
+                    "type": "array",
+                    "description": "Erwartetes Ergebnis der Prüfquery.",
+                    "items": { "type": "object" }
+                  }
+                },
+                "additionalProperties": false
+              },
+              {
+                "title": "UPDATE-Prüfung",
+                "description": "Prüft, ob Daten korrekt aktualisiert wurden.",
+                "required": ["typ", "pruefQuery", "erwartet"],
+                "properties": {
+                  "typ": { "const": "update_check" },
+                  "pruefQuery": {
+                    "type": "string",
+                    "description": "SQL-Abfrage, die die aktualisierten Daten prüft."
+                  },
+                  "erwartet": {
+                    "type": "array",
+                    "description": "Erwartetes Ergebnis der Prüfquery.",
+                    "items": { "type": "object" }
+                  }
+                },
+                "additionalProperties": false
+              },
+              {
+                "title": "ALTER-Prüfung",
+                "description": "Prüft, ob eine Tabelle korrekt verändert wurde.",
+                "required": ["typ", "tabellenname", "erwarteteSpaltendefinition"],
+                "properties": {
+                  "typ": { "const": "alter_check" },
+                  "tabellenname": {
+                    "type": "string",
+                    "description": "Name der zu prüfenden Tabelle."
+                  },
+                  "erwarteteSpaltendefinition": {
+                    "type": "array",
+                    "description": "Erwartete Spaltendefinitionen nach dem ALTER.",
+                    "items": { "$ref": "#/definitions/columnDef" }
+                  }
+                },
+                "additionalProperties": false
+              },
+              {
+                "title": "CREATE-Prüfung",
+                "description": "Prüft, ob eine Tabelle korrekt erstellt wurde.",
+                "required": ["typ", "tabellenname", "erwarteteSpaltendefinition"],
+                "properties": {
+                  "typ": { "const": "create_check" },
+                  "tabellenname": {
+                    "type": "string",
+                    "description": "Name der zu prüfenden Tabelle."
+                  },
+                  "erwarteteSpaltendefinition": {
+                    "type": "array",
+                    "description": "Erwartete Spaltendefinitionen der neuen Tabelle.",
+                    "items": { "$ref": "#/definitions/columnDef" }
+                  },
+                  "erwarteteIndizes": {
+                    "type": "array",
+                    "description": "Erwartete Indizes (optional).",
+                    "items": { "$ref": "#/definitions/indexDef" }
+                  }
+                },
+                "additionalProperties": false
+              },
+              {
+                "title": "GRANT-Prüfung",
+                "description": "Prüft, ob korrekte Rechte vergeben wurden.",
+                "required": ["typ", "benutzer", "rechte", "tabelle"],
+                "properties": {
+                  "typ": { "const": "grant_check" },
+                  "benutzer": {
+                    "type": "string",
+                    "description": "Name des Datenbank-Benutzers."
+                  },
+                  "rechte": {
+                    "type": "array",
+                    "description": "Erwartete Berechtigungen.",
+                    "items": {
+                      "type": "string",
+                      "enum": ["SELECT", "INSERT", "UPDATE", "DELETE"]
+                    }
+                  },
+                  "tabelle": {
+                    "type": "string",
+                    "description": "Name der Tabelle, auf die sich die Rechte beziehen."
+                  },
+                  "datenbank": {
+                    "type": "string",
+                    "description": "Optional: Name der Datenbank."
+                  }
+                },
+                "additionalProperties": false
+              },
+              {
+                "title": "Funktionstests",
+                "description": "Führt JavaScript-Testfälle gegen die Nutzerfunktion aus.",
+                "required": ["typ", "funktionsname", "testfaelle"],
+                "properties": {
+                  "typ": { "const": "function_tests" },
+                  "funktionsname": {
+                    "type": "string",
+                    "description": "Name der zu testenden JavaScript-Funktion."
+                  },
+                  "testfaelle": {
+                    "type": "array",
+                    "description": "Liste der Testfälle.",
+                    "items": {
+                      "type": "object",
+                      "required": ["beschreibung", "setup", "erwartet"],
+                      "properties": {
+                        "beschreibung": {
+                          "type": "string",
+                          "description": "Kurzbeschreibung des Testfalls (wird im Feedback angezeigt)."
+                        },
+                        "setup": {
+                          "type": "string",
+                          "description": "JS-Code, der die Testargumente bereitstellt (z.B. 'return [[arg1, arg2], arg3];')."
+                        },
+                        "erwartet": {
+                          "description": "Erwarteter Rückgabewert der Funktion. Kann primitiver Wert, Objekt oder Array sein."
+                        }
+                      },
+                      "additionalProperties": false
+                    },
+                    "minItems": 1
+                  }
+                },
+                "additionalProperties": false
+              },
+              {
+                "title": "Query-Fehlerprüfung",
+                "description": "Prüft, ob ein bestimmter Fehlertyp geworfen wird.",
+                "required": ["typ", "erwarterFehlertyp"],
+                "properties": {
+                  "typ": { "const": "query_error" },
+                  "erwarterFehlertyp": {
+                    "type": "string",
+                    "description": "Erwarteter Fehlertyp.",
+                    "enum": ["SyntaxError", "RuntimeError", "LogicError"]
+                  }
+                },
+                "additionalProperties": false
+              }
+            ]
+          }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false,
+  "definitions": {
+    "columnDef": {
+      "type": "object",
+      "required": ["name", "type"],
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Spaltenname."
+        },
+        "type": {
+          "type": "string",
+          "description": "SQL-Datentyp (z.B. INTEGER, TEXT, REAL)."
+        },
+        "notNull": {
+          "type": "boolean",
+          "description": "NOT NULL-Constraint."
+        },
+        "primaryKey": {
+          "type": "boolean",
+          "description": "PRIMARY KEY-Constraint."
+        },
+        "autoIncrement": {
+          "type": "boolean",
+          "description": "AUTOINCREMENT-Constraint."
+        }
+      },
+      "additionalProperties": false
+    },
+    "indexDef": {
+      "type": "object",
+      "required": ["name", "spalten"],
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Index-Name."
+        },
+        "spalten": {
+          "type": "array",
+          "description": "Enthaltene Spalten.",
+          "items": { "type": "string" }
+        },
+        "unique": {
+          "type": "boolean",
+          "description": "UNIQUE-Constraint."
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}

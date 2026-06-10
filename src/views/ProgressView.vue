@@ -177,7 +177,7 @@ async function handleExport() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `ihk-fortschritt-${new Date().toISOString().slice(0, 10)}.json`;
+    a.download = `fi-pruefungstrainer-fortschritt-${new Date().toISOString().slice(0, 10)}.json`;
     a.click();
     URL.revokeObjectURL(url);
   } catch (err: any) {

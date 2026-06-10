@@ -1,21 +1,22 @@
 import type { Task, TaskSet } from "@/types/task";
 import { storage } from "./storage";
 
+// Dynamisch alle JSON-Aufgabendateien im assets/aufgaben/ Verzeichnis erkennen
+const aufgabenModules = import.meta.glob<{ default: TaskSet }>(
+  "/src/assets/aufgaben/*.json",
+  { eager: true }
+);
+
 export const taskLoader = {
   async loadAll(): Promise<Task[]> {
     const allTasks: Task[] = [];
 
-    const builtInSets = ["krankenhaus"];
-
-    for (const setName of builtInSets) {
+    for (const [path, module] of Object.entries(aufgabenModules)) {
       try {
-        const response = await fetch(
-          `/src/assets/aufgaben/${setName}.json`
-        );
-        const data: TaskSet = await response.json();
+        const data = module.default;
         allTasks.push(...data.aufgaben);
       } catch (err) {
-        console.error(`Failed to load ${setName}.json:`, err);
+        console.error(`Failed to load ${path}:`, err);
       }
     }
 

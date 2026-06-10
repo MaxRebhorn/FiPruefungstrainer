@@ -1,0 +1,117 @@
+{
+  "gruppe": {
+    "id": "industrie4",
+    "titel": "Industrie 4.0 – WaltherGrundig Technologie GmbH",
+    "beschreibung": "Digitalisierung der Fabrik – Fokus auf JavaScript-Coding und Automatisierung"
+  },
+  "aufgaben": [
+    {
+      "id": "industrie4-1",
+      "typ": "javascript",
+      "schwierigkeit": "mittel",
+      "titel": "Gesamteffizienz der Fertigungslinie berechnen",
+      "beschreibung": "Mehrere Maschinen liefern Wirkungsgrade – eine Funktion kombiniert diese zu einem Gesamtwert.",
+      "kontext": "In der Fabrik von WaltherGrundig gibt es drei aufeinanderfolgende Produktionsmaschinen. Jede hat einen Wirkungsgrad (0..1). Der Gesamtwirkungsgrad ist das Produkt der Einzelwirkungsgrade. Zusätzlich soll ein Sicherheitsabschlag von 2% abgezogen werden, wenn eine Maschine älter als 10 Jahre ist.",
+      "aufgabenstellung": "Implementieren Sie die Funktion `berechneGesamteffizienz(wirkungsgrade, alterInJahren)`, die den Gesamtwirkungsgrad als Zahl (Prozentwert, 0-100) zurückgibt. Das Produkt der Wirkungsgrade wird mit 100 multipliziert. Wenn `alterInJahren > 10`, ziehen Sie 2 Prozentpunkte ab (nicht 2% des Werts). Das Ergebnis soll zwischen 0 und 100 begrenzt werden (Math.min/Math.max).",
+      "hinweise": [
+        "Verwenden Sie eine Schleife oder `reduce`, um die Wirkungsgrade zu multiplizieren",
+        "Denken Sie daran: Wirkungsgrade sind Dezimalzahlen (z.B. 0.95 für 95%)",
+        "Nutzen Sie `Math.max(0, Math.min(100, wert))` für die Begrenzung"
+      ],
+      "schema": [],
+      "gruppe": "industrie4",
+      "starterCode": "function berechneGesamteffizienz(wirkungsgrade, alterInJahren) {\n  // Dein Code hier\n}",
+      "loesung": {
+        "typ": "function_tests",
+        "funktionsname": "berechneGesamteffizienz",
+        "testfaelle": [
+          {
+            "beschreibung": "Neue Maschinen: 0.98, 0.97, 0.99 -> Produkt = 0.941094 -> 94.11%",
+            "setup": "return [[0.98, 0.97, 0.99], 8];",
+            "erwartet": 94.11
+          },
+          {
+            "beschreibung": "Alte Maschinen (15 Jahre): selbe Werte -> 2 Prozentpunkte Abzug = 92.11%",
+            "setup": "return [[0.98, 0.97, 0.99], 15];",
+            "erwartet": 92.11
+          },
+          {
+            "beschreibung": "Begrenzung unten: extrem schlechte Werte, alter=20 -> produkt=0.2 -> 20% -2% =18%",
+            "setup": "return [[0.5, 0.4, 1.0], 20];",
+            "erwartet": 18
+          }
+        ]
+      }
+    },
+    {
+      "id": "industrie4-2",
+      "typ": "javascript",
+      "schwierigkeit": "schwer",
+      "titel": "Wartungsplaner – nächsten Termin berechnen",
+      "beschreibung": "Berechnung des nächsten Wartungstermins basierend auf Laufzeit und Schichtbetrieb.",
+      "kontext": "Jede Maschine hat eine maximale Betriebsstundenzahl bis zur Wartung. Die tatsächliche Laufzeit pro Tag hängt von der Schichtzahl ab. Die Firma möchte eine Funktion, die aus den aktuellen Gesamtlaufstunden die Reststunden und den voraussichtlichen Wartungstermin berechnet.",
+      "aufgabenstellung": "Implementieren Sie die Funktion `naechsteWartung(aktuelleStunden, maxStunden, schichtenProTag, startDatum)`.  \n- `schichtenProTag`: 1, 2 oder 3 (jede Schicht = 8 Stunden).  \n- `startDatum`: ein Date-Objekt, ab dem weitergerechnet wird.  \nDie Funktion soll ein Date-Objekt zurückgeben, an dem die `maxStunden` erreicht oder überschritten werden.  \nGehen Sie von einem kontinuierlichen Betrieb (7 Tage/Woche) aus. Runden Sie den Termin auf den nächsten ganzen Tag (00:00 Uhr).",
+      "hinweise": [
+        "Berechnen Sie die verbleibenden Stunden: `rest = maxStunden - aktuelleStunden`",
+        "Stunden pro Tag = `schichtenProTag * 8`",
+        "Tage bis Wartung = `Math.ceil(rest / stundenProTag)`",
+        "Mit `startDatum.setDate(startDatum.getDate() + tage)` den Termin ermitteln"
+      ],
+      "schema": [],
+      "gruppe": "industrie4",
+      "starterCode": "function naechsteWartung(aktuelleStunden, maxStunden, schichtenProTag, startDatum) {\n  // Dein Code hier\n}",
+      "loesung": {
+        "typ": "function_tests",
+        "funktionsname": "naechsteWartung",
+        "testfaelle": [
+          {
+            "beschreibung": "Rest 50 Stunden, 2 Schichten/Tag (16h) -> 4 Tage (ceil 50/16=3,125 → 4)",
+            "setup": "return [950, 1000, 2, new Date('2025-03-10')];",
+            "erwartet": "2025-03-14T00:00:00.000Z"
+          },
+          {
+            "beschreibung": "Genau 48h Rest, 3 Schichten (24h) -> 2 Tage",
+            "setup": "return [2000, 2048, 3, new Date('2025-03-01')];",
+            "erwartet": "2025-03-03T00:00:00.000Z"
+          }
+        ]
+      }
+    },
+    {
+      "id": "industrie4-3",
+      "typ": "sql",
+      "schwierigkeit": "mittel",
+      "titel": "Stillstandszeiten pro Maschine auswerten",
+      "beschreibung": "SELECT mit Aggregation und Filterung.",
+      "kontext": "In der Tabelle `stillstaende` werden Ausfälle jeder Maschine protokolliert. Die Produktionsleitung möchte wissen, welche Maschinen die längste Gesamtausfallzeit im letzten Monat hatten.",
+      "aufgabenstellung": "Schreiben Sie eine Abfrage, die für jede Maschine die **Gesamtausfallzeit in Minuten** berechnet (Spalte `dauer_minuten`). Berücksichtigen Sie nur Stillstände, die im März 2025 begonnen haben (`startzeit` zwischen '2025-03-01' und '2025-03-31'). Geben Sie **Maschinenname** und **Gesamtausfall** aus. Sortieren Sie absteigend nach Ausfallzeit.",
+      "hinweise": [
+        "Tabelle `stillstaende`: maschine_id, dauer_minuten, startzeit",
+        "Tabelle `maschinen`: id, name, typ",
+        "Verwenden Sie JOIN und SUM, GROUP BY",
+        "Datumseinschränkung mit `WHERE startzeit BETWEEN ... AND ...`"
+      ],
+      "schema": [
+        "CREATE TABLE maschinen (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL, typ TEXT NOT NULL);",
+        "INSERT INTO maschinen VALUES (1, 'Fräsmaschine HD300', 'CNC');",
+        "INSERT INTO maschinen VALUES (2, 'Laser cutter', 'Laser');",
+        "INSERT INTO maschinen VALUES (3, 'Montageroboter R5', 'Roboter');",
+        "CREATE TABLE stillstaende (id INTEGER PRIMARY KEY AUTOINCREMENT, maschine_id INTEGER, dauer_minuten INTEGER NOT NULL, startzeit TEXT NOT NULL, grund TEXT, FOREIGN KEY (maschine_id) REFERENCES maschinen(id));",
+        "INSERT INTO stillstaende VALUES (1, 1, 45, '2025-03-02 08:00:00', 'Werkzeugbruch');",
+        "INSERT INTO stillstaende VALUES (2, 1, 120, '2025-03-15 13:30:00', 'Stromausfall');",
+        "INSERT INTO stillstaende VALUES (3, 2, 30, '2025-03-10 09:15:00', 'Kühlung defekt');",
+        "INSERT INTO stillstaende VALUES (4, 3, 15, '2025-03-20 10:00:00', 'Sensor Fehler');",
+        "INSERT INTO stillstaende VALUES (5, 3, 200, '2025-02-28 22:00:00', 'Defekt (Februar)');",
+        "INSERT INTO stillstaende VALUES (6, 2, 10, '2025-03-30 14:00:00', 'Justage');"
+      ],
+      "gruppe": "industrie4",
+      "starterCode": "SELECT ...",
+      "loesung": {
+        "typ": "select_compare",
+        "musterloesung": "SELECT m.name AS Maschinenname, SUM(s.dauer_minuten) AS Gesamtausfall FROM stillstaende s JOIN maschinen m ON s.maschine_id = m.id WHERE s.startzeit BETWEEN '2025-03-01' AND '2025-03-31 23:59:59' GROUP BY m.name ORDER BY Gesamtausfall DESC;",
+        "spaltenReihenfolgeIgnorieren": false,
+        "zeilenReihenfolgeIgnorieren": true
+      }
+    }
+  ]
+}

@@ -2,7 +2,7 @@
   <header class="app-header">
     <div class="header-left">
       <button @click="$emit('toggle-sidebar')" class="menu-btn" title="Menü">☰</button>
-      <router-link to="/" class="logo">IHK Aufgabenplattform</router-link>
+      <router-link to="/" class="logo">FI Prüfungstrainer</router-link>
     </div>
     <nav class="header-nav">
       <router-link to="/" class="nav-link">Aufgaben</router-link>

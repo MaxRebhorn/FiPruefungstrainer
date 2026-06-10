@@ -1,0 +1,88 @@
+{
+  "gruppe": {
+    "id": "diakonie",
+    "titel": "Diakonie – Evangelische Kirche",
+    "beschreibung": "Kostenanalyse und Strukturprüfung mit SQL"
+  },
+  "aufgaben": [
+    {
+      "id": "diakonie-1",
+      "typ": "sql",
+      "schwierigkeit": "leicht",
+      "titel": "Bereiche mit überdurchschnittlichen Ausgaben",
+      "beschreibung": "Einfache Aggregation mit HAVING und Unterabfrage.",
+      "kontext": "Die Diakonie möchte ihre sozialen Bereiche (z.B. Jugendhilfe, Seniorenarbeit) analysieren. Für jeden Bereich werden monatlich Ausgaben erfasst. Die Leitung will wissen, welche Bereiche mehr ausgeben als der Durchschnitt aller Bereiche.",
+      "aufgabenstellung": "Ermitteln Sie die Bereiche, deren **Gesamtausgaben** (Summe aller Buchungen) über dem **Gesamtdurchschnitt aller Bereiche** liegen. Geben Sie **Bereichsname** und **Gesamtausgaben** aus. Sortieren Sie absteigend nach Ausgaben.",
+      "hinweise": [
+        "Tabelle `bereiche`: id, name, budget",
+        "Tabelle `ausgaben`: id, bereich_id, betrag, datum",
+        "Verwenden Sie GROUP BY bereich_id, dann HAVING SUM(betrag) > (SELECT AVG(summe) FROM ...)"
+      ],
+      "schema": [
+        "CREATE TABLE bereiche (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL, budget REAL NOT NULL);",
+        "INSERT INTO bereiche VALUES (1, 'Jugendhilfe', 50000);",
+        "INSERT INTO bereiche VALUES (2, 'Seniorenarbeit', 45000);",
+        "INSERT INTO bereiche VALUES (3, 'Obdachlosenhilfe', 60000);",
+        "INSERT INTO bereiche VALUES (4, 'Beratungsstelle', 30000);",
+        "CREATE TABLE ausgaben (id INTEGER PRIMARY KEY AUTOINCREMENT, bereich_id INTEGER, betrag REAL NOT NULL, datum TEXT NOT NULL, zweck TEXT, FOREIGN KEY (bereich_id) REFERENCES bereiche(id));",
+        "INSERT INTO ausgaben VALUES (1, 1, 12000, '2025-01-15', 'Personal');",
+        "INSERT INTO ausgaben VALUES (2, 1, 8000, '2025-02-10', 'Material');",
+        "INSERT INTO ausgaben VALUES (3, 2, 25000, '2025-01-20', 'Miete');",
+        "INSERT INTO ausgaben VALUES (4, 2, 5000, '2025-02-05', 'Verpflegung');",
+        "INSERT INTO ausgaben VALUES (5, 3, 18000, '2025-01-25', 'Betreuung');",
+        "INSERT INTO ausgaben VALUES (6, 3, 7000, '2025-02-18', 'Verwaltung');",
+        "INSERT INTO ausgaben VALUES (7, 4, 9000, '2025-01-30', 'Fortbildung');",
+        "INSERT INTO ausgaben VALUES (8, 4, 4000, '2025-02-14', 'Büro');"
+      ],
+      "gruppe": "diakonie",
+      "starterCode": "SELECT ...",
+      "loesung": {
+        "typ": "select_compare",
+        "musterloesung": "SELECT b.name AS Bereichsname, SUM(a.betrag) AS Gesamtausgaben FROM bereiche b JOIN ausgaben a ON b.id = a.bereich_id GROUP BY b.name HAVING SUM(a.betrag) > (SELECT AVG(bereichssumme) FROM (SELECT SUM(betrag) AS bereichssumme FROM ausgaben GROUP BY bereich_id)) ORDER BY Gesamtausgaben DESC;",
+        "spaltenReihenfolgeIgnorieren": false,
+        "zeilenReihenfolgeIgnorieren": true
+      }
+    },
+    {
+      "id": "diakonie-2",
+      "typ": "sql",
+      "schwierigkeit": "schwer",
+      "titel": "Sparpotenzial durch Personalauslastung",
+      "beschreibung": "Mehrere JOINs, CASE, Fensterfunktionen (oder Subqueries).",
+      "kontext": "Um zu sparen, möchte die Diakonie Personalausgaben mit der Anzahl der betreuten Personen in Relation setzen. Bereiche mit niedriger Auslastung (wenig betreute Personen pro Mitarbeiter) sind ineffizient.",
+      "aufgabenstellung": "Berechnen Sie für jeden Bereich die **Anzahl der Mitarbeiter** (Tabelle `personal`), die **Summe der Personalkosten** (aus `ausgaben` mit zweck = 'Personal') und die **Anzahl der betreuten Personen** (Tabelle `betreuung`).  \nErmitteln Sie dann die **Kosten pro betreuter Person** und kennzeichnen Sie Bereiche mit einem **Effizienzlabel**:  \n- 'Grün' wenn Kosten pro Person < 1000  \n- 'Gelb' wenn zwischen 1000 und 2000  \n- 'Rot' wenn > 2000  \nGeben Sie aus: Bereichsname, Kosten_pro_Person, Label. Sortieren Sie nach Kosten absteigend.",
+      "hinweise": [
+        "Nutzen Sie LEFT JOIN, da möglicherweise keine Betreuung oder kein Personal vorhanden ist",
+        "Verwenden Sie CASE für das Label",
+        "Bei fehlenden Betreuungszahlen nehmen Sie 'Rot' an (da keine Effizienz)"
+      ],
+      "schema": [
+        "CREATE TABLE bereiche (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL);",
+        "INSERT INTO bereiche VALUES (1, 'Jugendhilfe');",
+        "INSERT INTO bereiche VALUES (2, 'Seniorenarbeit');",
+        "INSERT INTO bereiche VALUES (3, 'Obdachlosenhilfe');",
+        "CREATE TABLE personal (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, bereich_id INTEGER, gehalt REAL, FOREIGN KEY (bereich_id) REFERENCES bereiche(id));",
+        "INSERT INTO personal VALUES (1, 'Anna', 1, 3500);",
+        "INSERT INTO personal VALUES (2, 'Bernd', 1, 3800);",
+        "INSERT INTO personal VALUES (3, 'Clara', 2, 4000);",
+        "INSERT INTO personal VALUES (4, 'Dieter', 3, 3700);",
+        "CREATE TABLE betreuung (id INTEGER PRIMARY KEY AUTOINCREMENT, bereich_id INTEGER, anzahl_personen INTEGER, monat TEXT, FOREIGN KEY (bereich_id) REFERENCES bereiche(id));",
+        "INSERT INTO betreuung VALUES (1, 1, 45, '2025-02');",
+        "INSERT INTO betreuung VALUES (2, 2, 30, '2025-02');",
+        "INSERT INTO betreuung VALUES (3, 3, 120, '2025-02');",
+        "CREATE TABLE ausgaben (id INTEGER PRIMARY KEY AUTOINCREMENT, bereich_id INTEGER, betrag REAL, zweck TEXT, FOREIGN KEY (bereich_id) REFERENCES bereiche(id));",
+        "INSERT INTO ausgaben VALUES (1, 1, 7300, 'Personal');",
+        "INSERT INTO ausgaben VALUES (2, 2, 4000, 'Personal');",
+        "INSERT INTO ausgaben VALUES (3, 3, 3700, 'Personal');"
+      ],
+      "gruppe": "diakonie",
+      "starterCode": "SELECT ...",
+      "loesung": {
+        "typ": "select_compare",
+        "musterloesung": "SELECT b.name AS Bereichsname, COALESCE(SUM(p.gehalt),0) / COALESCE(bt.anzahl_personen,1) AS Kosten_pro_Person, CASE WHEN COALESCE(bt.anzahl_personen,0) = 0 THEN 'Rot' WHEN COALESCE(SUM(p.gehalt),0) / bt.anzahl_personen < 1000 THEN 'Grün' WHEN COALESCE(SUM(p.gehalt),0) / bt.anzahl_personen BETWEEN 1000 AND 2000 THEN 'Gelb' ELSE 'Rot' END AS Label FROM bereiche b LEFT JOIN personal p ON b.id = p.bereich_id LEFT JOIN betreuung bt ON b.id = bt.bereich_id GROUP BY b.id ORDER BY Kosten_pro_Person DESC;",
+        "spaltenReihenfolgeIgnorieren": false,
+        "zeilenReihenfolgeIgnorieren": true
+      }
+    }
+  ]
+}

@@ -1,7 +1,7 @@
 import type { TaskProgress } from "@/types";
 
-const STORAGE_PREFIX = "ihk_";
-const DB_NAME = "IHKPlattform";
+const STORAGE_PREFIX = "fi_";
+const DB_NAME = "FIPlattform";
 const STORE_NAME = "tasks";
 
 export const storage = {

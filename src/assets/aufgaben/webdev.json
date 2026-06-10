@@ -1,0 +1,75 @@
+{
+  "gruppe": {
+    "id": "webdev",
+    "titel": "Webentwicklung – Ger Agentur für Johannes Walter",
+    "beschreibung": "Kundendatenbank mit JavaScript-Backend-Simulation und SQL"
+  },
+  "aufgaben": [
+    {
+      "id": "webdev-1",
+      "typ": "javascript",
+      "schwierigkeit": "leicht",
+      "titel": "Benutzer aus simulierter Datenbank anhand ID finden",
+      "beschreibung": "JavaScript-Funktion, die ein Array durchsucht und den passenden Benutzer zurückgibt.",
+      "kontext": "Die Website von Johannes Walter Elektrotechniker benötigt eine Funktion, die aus einem vorgegebenen Benutzer-Array (z.B. aus einer Fetch-Anfrage) den Datensatz zur ID findet. Da das Backend noch nicht angebunden ist, wird die Funktion zuerst lokal getestet.",
+      "aufgabenstellung": "Implementieren Sie die Funktion `findeBenutzerNachId(benutzerArray, id)`, die ein Array von Benutzerobjekten (je mit `id`, `name`, `email`) und eine numerische ID erhält. Sie soll das Benutzerobjekt zurückgeben, wenn vorhanden, sonst `null`. Verwenden Sie die Array-Methode `find`.",
+      "hinweise": [
+        "Die ID ist eine Zahl, die Eigenschaft im Objekt ebenfalls `id`",
+        "Wenn nichts gefunden wird, gibt `find` `undefined` zurück – das müssen Sie in `null` umwandeln"
+      ],
+      "schema": [],
+      "gruppe": "webdev",
+      "starterCode": "function findeBenutzerNachId(benutzerArray, id) {\n  // Dein Code hier\n}",
+      "loesung": {
+        "typ": "function_tests",
+        "funktionsname": "findeBenutzerNachId",
+        "testfaelle": [
+          {
+            "beschreibung": "Vorhandene ID 2 -> Benutzerobjekt",
+            "setup": "return [[{id:1,name:'Max'},{id:2,name:'Anna'},{id:3,name:'Tom'}], 2];",
+            "erwartet": { "id": 2, "name": "Anna" }
+          },
+          {
+            "beschreibung": "Nicht vorhandene ID 99 -> null",
+            "setup": "return [[{id:1,name:'Max'}], 99];",
+            "erwartet": null
+          }
+        ]
+      }
+    },
+    {
+      "id": "webdev-2",
+      "typ": "sql",
+      "schwierigkeit": "mittel",
+      "titel": "Kunden mit offenen Rechnungen abrufen",
+      "beschreibung": "SELECT mit WHERE und Unterabfrage bzw. JOIN.",
+      "kontext": "Die Kundendatenbank von Johannes Walter enthält Kunden (Tabelle `kunden`) und Rechnungen (`rechnungen`). Eine Abfrage soll alle Kunden zeigen, die noch mindestens eine unbezahlte Rechnung haben (`bezahlt = 0`).",
+      "aufgabenstellung": "Schreiben Sie eine SQL-Abfrage, die **Kunden-ID, Name** und die **Summe der offenen Beträge** ausgibt. Berücksichtigen Sie nur Rechnungen mit `bezahlt = 0`. Sortieren Sie absteigend nach der offenen Summe.",
+      "hinweise": [
+        "Verwenden Sie `INNER JOIN` zwischen `kunden` und `rechnungen`",
+        "Gruppieren Sie nach Kunden-ID und Namen",
+        "Nutzen Sie `SUM(rechnungen.betrag)`"
+      ],
+      "schema": [
+        "CREATE TABLE kunden (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL, email TEXT NOT NULL);",
+        "INSERT INTO kunden VALUES (1, 'Elektro Müller', 'info@elektro-mueller.de');",
+        "INSERT INTO kunden VALUES (2, 'Hausbau Schmidt', 'schmidt@bau.de');",
+        "INSERT INTO kunden VALUES (3, 'Kita Sonnenschein', 'kita@sonne.de');",
+        "CREATE TABLE rechnungen (id INTEGER PRIMARY KEY AUTOINCREMENT, kunden_id INTEGER, betrag REAL NOT NULL, bezahlt INTEGER DEFAULT 0, faelligkeit TEXT, FOREIGN KEY (kunden_id) REFERENCES kunden(id));",
+        "INSERT INTO rechnungen VALUES (1, 1, 1250.00, 0, '2025-04-01');",
+        "INSERT INTO rechnungen VALUES (2, 1, 340.00, 1, '2025-03-15');",
+        "INSERT INTO rechnungen VALUES (3, 2, 5000.00, 0, '2025-04-10');",
+        "INSERT INTO rechnungen VALUES (4, 3, 890.00, 0, '2025-04-05');",
+        "INSERT INTO rechnungen VALUES (5, 2, 250.00, 1, '2025-03-20');"
+      ],
+      "gruppe": "webdev",
+      "starterCode": "SELECT ...",
+      "loesung": {
+        "typ": "select_compare",
+        "musterloesung": "SELECT k.id AS KundenID, k.name AS Kundenname, SUM(r.betrag) AS OffeneSumme FROM kunden k JOIN rechnungen r ON k.id = r.kunden_id WHERE r.bezahlt = 0 GROUP BY k.id ORDER BY OffeneSumme DESC;",
+        "spaltenReihenfolgeIgnorieren": false,
+        "zeilenReihenfolgeIgnorieren": true
+      }
+    }
+  ]
+}
