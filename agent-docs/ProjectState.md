@@ -38,13 +38,16 @@
 
 ## Phase 5: Komponenten
 
-- [ ] `src/components/EditorPanel.vue`
-- [ ] `src/components/FeedbackPanel.vue`
-- [ ] `src/components/DiffTable.vue`
-- [ ] `src/components/Header.vue`, `Sidebar.vue`
-- [ ] `src/views/TaskListView.vue` – Mit Filter
-- [ ] `src/views/TaskDetailView.vue` – Haupt-Editor
-- [ ] `src/views/ProgressView.vue` – Statistik
+- [x] `src/components/EditorPanel.vue` – CodeMirror-Editor mit createCodeMirror-Plugin
+- [x] `src/components/FeedbackPanel.vue` – Ergebnis-Anzeige (SQL-Diff, JS-Testfälle)
+- [x] `src/components/DiffTable.vue` – Spalten-/Zeilen-Diff
+- [x] `src/components/Header.vue`, `Sidebar.vue` – Sidebar mit Live-Filtern + Suche
+- [x] `src/components/TaskListItem.vue` – Aufgabenkarte mit Badges
+- [x] `src/components/HintModal.vue` – Hinweismodal
+- [x] `src/components/UploadModal.vue` – JSON-Upload mit Drag & Drop
+- [x] `src/views/TaskListView.vue` – Grid mit Lade-/Fehler-/Leerzustand
+- [x] `src/views/TaskDetailView.vue` – Zwei-Spalten-Layout mit Editor + Feedback
+- [x] `src/views/ProgressView.vue` – Statistik-Dashboard
 
 ## Phase 6: Aufgaben + Testing
 
