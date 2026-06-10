@@ -3,6 +3,7 @@ import { EditorState } from "@codemirror/state";
 import { basicSetup } from "codemirror";
 import { sql, SQLite } from "@codemirror/lang-sql";
 import { javascript } from "@codemirror/lang-javascript";
+import { autocompletion, CompletionContext } from "@codemirror/autocomplete";
 
 export function createCodeMirror(
   container: HTMLElement,
@@ -10,6 +11,8 @@ export function createCodeMirror(
     doc?: string;
     lang: "sql" | "javascript";
     onChange?: (value: string) => void;
+    /** Additional completions for JS (e.g. mock class/function names) */
+    extraCompletions?: string[];
   }
 ): EditorView {
   const lang =
@@ -32,6 +35,28 @@ export function createCodeMirror(
       },
     }),
   ];
+
+  // Add extra JS completions (for mocks / predefined classes)
+  if (options.extraCompletions && options.extraCompletions.length > 0) {
+    extensions.push(
+      autocompletion({
+        override: [
+          (context: CompletionContext) => {
+            const word = context.matchBefore(/\w+/);
+            if (!word || (word.from === word.to && !context.explicit)) return null;
+            return {
+              from: word.from,
+              options: options.extraCompletions!.map((name) => ({
+                label: name,
+                type: "class",
+                detail: "vordefiniert",
+              })),
+            };
+          },
+        ],
+      })
+    );
+  }
 
   if (options.onChange) {
     extensions.push(

@@ -15,6 +15,8 @@
           <div class="markdown-block">
             <div class="markdown" v-html="renderedContext"></div>
           </div>
+          <SchemaPreview v-if="task.typ === 'sql' && task.schema" :schema="task.schema" />
+          <ClassOverview v-if="task.typ === 'javascript'" :starter-code="task.starterCode" />
           <div class="aufgabenstellung-block">
             <h3>Aufgabenstellung</h3>
             <div class="markdown" v-html="renderedAufgabe"></div>
@@ -50,6 +52,8 @@ import { marked } from "marked";
 import EditorPanel from "@/components/EditorPanel.vue";
 import FeedbackPanel from "@/components/FeedbackPanel.vue";
 import HintModal from "@/components/HintModal.vue";
+import SchemaPreview from "@/components/SchemaPreview.vue";
+import ClassOverview from "@/components/ClassOverview.vue";
 import { SQLiteRunner } from "@/core/db";
 import { JSRunner } from "@/core/jsRunner";
 import type { ValidationResult } from "@/types";

@@ -16,7 +16,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted, onBeforeUnmount } from "vue";
-import type { Task } from "@/types/task";
+import type { Task, JSTask } from "@/types/task";
 import { useEditorStore } from "@/stores/editorStore";
 import { createCodeMirror } from "@/plugins/codemirror";
 
@@ -33,9 +33,18 @@ let editor: ReturnType<typeof createCodeMirror>;
 onMounted(() => {
   const startCode = editorStore.getCode(props.task.id) || props.task.starterCode || "";
 
+  // Collect mock names for autocompletion in JS tasks
+  const extraCompletions: string[] = [];
+  if (props.task.typ === "javascript" && props.task.mocks) {
+    for (const name of Object.keys(props.task.mocks)) {
+      extraCompletions.push(name);
+    }
+  }
+
   editor = createCodeMirror(editorContainer.value!, {
     doc: startCode,
     lang: props.task.typ,
+    extraCompletions: extraCompletions.length > 0 ? extraCompletions : undefined,
     onChange: (value) => {
       editorStore.setCode(props.task.id, value);
     }

@@ -62,3 +62,9 @@
 - [ ] Mobile Responsive Layout
 - [ ] Upload-Modal für Custom Tasks
 - [ ] Export/Import Funktionalität
+
+
+## Phase 8: UI improvement
+
+- [x] SQL Table preview (Shows a overview of the SQL Tables with their fields for SQL tasks)
+- [x] Javascript Class and Function Overview (If a Task has pre defined Classes they should be shown as an overview and also recognised within the Tasks code editor but not shown within it)
