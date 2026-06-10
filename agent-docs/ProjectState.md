@@ -51,8 +51,8 @@
 
 ## Phase 6: Aufgaben + Testing
 
-- [ ] `src/assets/aufgaben/krankenhaus.json` – 7 SQL + 1 JS
-- [ ] `public/sql-wasm.wasm` kopieren
+- [x] `src/assets/aufgaben/krankenhaus.json` – 7 SQL + 1 JS
+- [x] `public/sql-wasm.wasm` kopieren
 - [ ] `npm run dev` – Tests im Browser
 - [ ] Edge Cases testen (Fehlerbehandlung, Timeouts)
 
