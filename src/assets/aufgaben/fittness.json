@@ -1,0 +1,113 @@
+{
+  "gruppe": {
+    "id": "fitnessstudio",
+    "titel": "Fitnessstudio-Verwaltung",
+    "beschreibung": "Mitglieder, Verträge, Beiträge und Check-ins"
+  },
+  "aufgaben": [
+    {
+      "id": "fitness-1",
+      "typ": "sql",
+      "schwierigkeit": "leicht",
+      "titel": "Mitglieder mit abgelaufenem Vertrag",
+      "beschreibung": "SELECT mit WHERE-Datum.",
+      "kontext": "Das Fitnessstudio möchte alle Mitglieder anzeigen, deren Vertragsende vor dem heutigen Datum ('2025-03-01') liegt, um sie zur Verlängerung zu kontaktieren.",
+      "aufgabenstellung": "Zeigen Sie **Vorname, Nachname, Vertragsende** der Mitglieder, deren Vertragsende vor '2025-03-01' liegt. Sortieren Sie nach Vertragsende absteigend (die längst abgelaufenen zuerst).",
+      "hinweise": [
+        "Tabelle 'mitglieder' hat Spalten vorname, nachname, vertragsende (TEXT im Format YYYY-MM-DD)",
+        "Verwenden Sie WHERE vertragsende < '2025-03-01'"
+      ],
+      "schema": [
+        "CREATE TABLE mitglieder (id INTEGER PRIMARY KEY AUTOINCREMENT, vorname TEXT NOT NULL, nachname TEXT NOT NULL, vertragstyp TEXT NOT NULL, vertragsende TEXT NOT NULL, beitrag REAL NOT NULL);",
+        "INSERT INTO mitglieder VALUES (1, 'Anna', 'Schmidt', 'Basic', '2025-02-15', 29.99);",
+        "INSERT INTO mitglieder VALUES (2, 'Bernd', 'Fischer', 'Premium', '2025-04-01', 49.99);",
+        "INSERT INTO mitglieder VALUES (3, 'Clara', 'Weber', 'Basic', '2025-01-10', 29.99);",
+        "INSERT INTO mitglieder VALUES (4, 'Dieter', 'Meyer', 'Premium', '2025-05-20', 49.99);",
+        "CREATE TABLE checkins (id INTEGER PRIMARY KEY AUTOINCREMENT, mitglied_id INTEGER, datum TEXT, uhrzeit TEXT, FOREIGN KEY (mitglied_id) REFERENCES mitglieder(id));",
+        "INSERT INTO checkins VALUES (1, 1, '2025-02-20', '10:00');",
+        "INSERT INTO checkins VALUES (2, 2, '2025-02-25', '18:30');",
+        "INSERT INTO checkins VALUES (3, 1, '2025-02-22', '09:15');"
+      ],
+      "gruppe": "fitnessstudio",
+      "starterCode": "SELECT ...",
+      "loesung": {
+        "typ": "select_compare",
+        "musterloesung": "SELECT vorname, nachname, vertragsende FROM mitglieder WHERE vertragsende < '2025-03-01' ORDER BY vertragsende DESC;",
+        "spaltenReihenfolgeIgnorieren": false,
+        "zeilenReihenfolgeIgnorieren": false
+      }
+    },
+    {
+      "id": "fitness-2",
+      "typ": "sql",
+      "schwierigkeit": "mittel",
+      "titel": "Check-ins pro Mitglied zählen",
+      "beschreibung": "Aggregation mit GROUP BY, LEFT JOIN, COUNT.",
+      "kontext": "Die Studioleitung möchte wissen, wie oft jedes Mitglied eingecheckt hat, um die Auslastung zu analysieren. Auch Mitglieder ohne Check-in sollen mit 0 erscheinen.",
+      "aufgabenstellung": "Zählen Sie für jedes Mitglied die Anzahl der Check-ins. Geben Sie **Vorname, Nachname, Anzahl_Checkins** aus. Sortieren Sie absteigend nach Anzahl, bei gleicher Anzahl alphabetisch nach Nachname.",
+      "hinweise": [
+        "Verwenden Sie LEFT JOIN zwischen mitglieder und checkins",
+        "COUNT(checkins.id) zählt nur vorhandene Check-ins",
+        "GROUP BY mitglieder.id"
+      ],
+      "schema": [
+        "CREATE TABLE mitglieder (id INTEGER PRIMARY KEY AUTOINCREMENT, vorname TEXT NOT NULL, nachname TEXT NOT NULL, vertragstyp TEXT NOT NULL, vertragsende TEXT NOT NULL, beitrag REAL NOT NULL);",
+        "INSERT INTO mitglieder VALUES (1, 'Anna', 'Schmidt', 'Basic', '2025-02-15', 29.99);",
+        "INSERT INTO mitglieder VALUES (2, 'Bernd', 'Fischer', 'Premium', '2025-04-01', 49.99);",
+        "INSERT INTO mitglieder VALUES (3, 'Clara', 'Weber', 'Basic', '2025-01-10', 29.99);",
+        "INSERT INTO mitglieder VALUES (4, 'Dieter', 'Meyer', 'Premium', '2025-05-20', 49.99);",
+        "CREATE TABLE checkins (id INTEGER PRIMARY KEY AUTOINCREMENT, mitglied_id INTEGER, datum TEXT, uhrzeit TEXT, FOREIGN KEY (mitglied_id) REFERENCES mitglieder(id));",
+        "INSERT INTO checkins VALUES (1, 1, '2025-02-20', '10:00');",
+        "INSERT INTO checkins VALUES (2, 2, '2025-02-25', '18:30');",
+        "INSERT INTO checkins VALUES (3, 1, '2025-02-22', '09:15');"
+      ],
+      "gruppe": "fitnessstudio",
+      "starterCode": "SELECT ...",
+      "loesung": {
+        "typ": "select_compare",
+        "musterloesung": "SELECT m.vorname, m.nachname, COUNT(c.id) AS Anzahl_Checkins FROM mitglieder m LEFT JOIN checkins c ON m.id = c.mitglied_id GROUP BY m.id ORDER BY Anzahl_Checkins DESC, m.nachname;",
+        "spaltenReihenfolgeIgnorieren": false,
+        "zeilenReihenfolgeIgnorieren": true
+      }
+    },
+    {
+      "id": "fitness-3",
+      "typ": "javascript",
+      "schwierigkeit": "schwer",
+      "titel": "Beitragsberechnung bei Vertragswechsel",
+      "beschreibung": "JavaScript-Funktion mit anteiliger Berechnung und Datumslogik.",
+      "kontext": "Ein Mitglied wechselt mitten im Monat von 'Basic' (29,99€/Monat) zu 'Premium' (49,99€/Monat). Der Beitrag für den Wechselmonat soll anteilig nach Tagen berechnet werden. Ein Monat hat 30 Tage (vereinfacht).",
+      "aufgabenstellung": "Implementieren Sie die Funktion `berechneWechselBeitrag(wechseltag, grundbeitragAlt, grundbeitragNeu)`.\\n- `wechseltag` = Tag des Monats (1-30), an dem gewechselt wird (z.B. 15 = ab dem 15. gilt der neue Tarif).\\n- Alt-Tarif gilt für die Tage 1 bis wechseltag-1, Neu-Tarif für wechseltag bis 30.\\n- Die Funktion soll den Gesamtbeitrag für diesen Monat zurückgeben (auf 2 Dezimalstellen gerundet).",
+      "hinweise": [
+        "Tage alt = wechseltag - 1, Tage neu = 30 - wechseltag + 1",
+        "Anteil alt = (tageAlt / 30) * grundbeitragAlt",
+        "Anteil neu = (tageNeu / 30) * grundbeitragNeu",
+        "Verwenden Sie Math.round(beitrag * 100) / 100"
+      ],
+      "schema": [],
+      "gruppe": "fitnessstudio",
+      "starterCode": "function berechneWechselBeitrag(wechseltag, grundbeitragAlt, grundbeitragNeu) {\n  // Dein Code hier\n}",
+      "loesung": {
+        "typ": "function_tests",
+        "funktionsname": "berechneWechselBeitrag",
+        "testfaelle": [
+          {
+            "beschreibung": "Wechsel am 1. (sofort neu) → nur neuer Tarif",
+            "setup": "return [1, 29.99, 49.99];",
+            "erwartet": 49.99
+          },
+          {
+            "beschreibung": "Wechsel am 30. (fast ganzer Monat alt)",
+            "setup": "return [30, 29.99, 49.99];",
+            "erwartet": 29.99
+          },
+          {
+            "beschreibung": "Wechsel am 15. (14 Tage alt, 16 Tage neu)",
+            "setup": "return [15, 29.99, 49.99];",
+            "erwartet": 40.66
+          }
+        ]
+      }
+    }
+  ]
+}

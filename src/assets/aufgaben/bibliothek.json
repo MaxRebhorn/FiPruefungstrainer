@@ -1,0 +1,121 @@
+{
+  "gruppe": {
+    "id": "bibliothek",
+    "titel": "Bibliotheksverwaltung",
+    "beschreibung": "Verwaltung von Büchern, Autoren, Ausleihen und Mahnungen"
+  },
+  "aufgaben": [
+    {
+      "id": "bibliothek-1",
+      "typ": "sql",
+      "schwierigkeit": "leicht",
+      "titel": "Alle Bücher mit Autor anzeigen",
+      "beschreibung": "SELECT mit JOIN über zwei Tabellen.",
+      "kontext": "In der Bibliothek werden Bücher in einer Tabelle 'buecher' gespeichert, jeder Buchdatensatz enthält eine Autor-ID. Die Verwaltung möchte eine Liste aller Bücher mit den Namen der Autoren.",
+      "aufgabenstellung": "Zeigen Sie alle Bücher mit dem zugehörigen Autorennamen. Geben Sie die Spalten **Titel**, **Autor** und **Erscheinungsjahr** aus. Sortieren Sie alphabetisch nach dem Buchtitel.",
+      "hinweise": [
+        "Verwenden Sie INNER JOIN über buecher.autor_id und autoren.id",
+        "Vergeben Sie Spaltenaliasse mit AS",
+        "Sortieren Sie mit ORDER BY"
+      ],
+      "schema": [
+        "CREATE TABLE autoren (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL, geburtsjahr INTEGER);",
+        "INSERT INTO autoren VALUES (1, 'Stephen King', 1947);",
+        "INSERT INTO autoren VALUES (2, 'J.K. Rowling', 1965);",
+        "INSERT INTO autoren VALUES (3, 'Thomas Mann', 1875);",
+        "CREATE TABLE buecher (id INTEGER PRIMARY KEY AUTOINCREMENT, titel TEXT NOT NULL, autor_id INTEGER, jahr INTEGER NOT NULL, FOREIGN KEY (autor_id) REFERENCES autoren(id));",
+        "INSERT INTO buecher VALUES (1, 'The Shining', 1, 1977);",
+        "INSERT INTO buecher VALUES (2, 'Harry Potter 1', 2, 1997);",
+        "INSERT INTO buecher VALUES (3, 'Der Zauberberg', 3, 1924);",
+        "INSERT INTO buecher VALUES (4, 'Es', 1, 1986);",
+        "CREATE TABLE ausleihen (id INTEGER PRIMARY KEY AUTOINCREMENT, buch_id INTEGER, ausleiher TEXT, ausleihdatum TEXT, rückgabedatum TEXT, FOREIGN KEY (buch_id) REFERENCES buecher(id));",
+        "INSERT INTO ausleihen VALUES (1, 1, 'Anna', '2025-02-01', NULL);",
+        "INSERT INTO ausleihen VALUES (2, 2, 'Bernd', '2025-02-10', '2025-02-20');",
+        "INSERT INTO ausleihen VALUES (3, 3, 'Clara', '2025-01-15', NULL);"
+      ],
+      "gruppe": "bibliothek",
+      "starterCode": "SELECT ...",
+      "loesung": {
+        "typ": "select_compare",
+        "musterloesung": "SELECT b.titel AS Titel, a.name AS Autor, b.jahr AS Erscheinungsjahr FROM buecher b JOIN autoren a ON b.autor_id = a.id ORDER BY b.titel;",
+        "spaltenReihenfolgeIgnorieren": false,
+        "zeilenReihenfolgeIgnorieren": false
+      }
+    },
+    {
+      "id": "bibliothek-2",
+      "typ": "sql",
+      "schwierigkeit": "mittel",
+      "titel": "Aktuell ausgeliehene Bücher mit Verspätung",
+      "beschreibung": "SELECT mit NULL-Prüfung, Datumsdifferenz, CASE.",
+      "kontext": "Die Bibliothek möchte eine Mahnliste erstellen. Ein Buch gilt als verspätet, wenn das Rückgabedatum NULL ist und das Ausleihdatum mehr als 14 Tage zurückliegt (heutiges Datum = '2025-03-01').",
+      "aufgabenstellung": "Ermitteln Sie alle aktuell ausgeliehenen Bücher (rückgabedatum IS NULL), deren Ausleihdatum vor '2025-02-15' liegt (also mehr als 14 Tage). Geben Sie **Titel, Ausleiher, Ausleihdatum** sowie eine Spalte **Status** aus mit dem Wert 'Mahnung' bei Verspätung, sonst 'OK'. Sortieren Sie nach Ausleihdatum absteigend.",
+      "hinweise": [
+        "Verwenden Sie WHERE rückgabedatum IS NULL AND ausleihdatum < '2025-02-15'",
+        "CASE WHEN bedingung THEN 'Mahnung' ELSE 'OK' END"
+      ],
+      "schema": [
+        "CREATE TABLE autoren (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL, geburtsjahr INTEGER);",
+        "INSERT INTO autoren VALUES (1, 'Stephen King', 1947);",
+        "INSERT INTO autoren VALUES (2, 'J.K. Rowling', 1965);",
+        "INSERT INTO autoren VALUES (3, 'Thomas Mann', 1875);",
+        "CREATE TABLE buecher (id INTEGER PRIMARY KEY AUTOINCREMENT, titel TEXT NOT NULL, autor_id INTEGER, jahr INTEGER NOT NULL, FOREIGN KEY (autor_id) REFERENCES autoren(id));",
+        "INSERT INTO buecher VALUES (1, 'The Shining', 1, 1977);",
+        "INSERT INTO buecher VALUES (2, 'Harry Potter 1', 2, 1997);",
+        "INSERT INTO buecher VALUES (3, 'Der Zauberberg', 3, 1924);",
+        "INSERT INTO buecher VALUES (4, 'Es', 1, 1986);",
+        "CREATE TABLE ausleihen (id INTEGER PRIMARY KEY AUTOINCREMENT, buch_id INTEGER, ausleiher TEXT, ausleihdatum TEXT, rückgabedatum TEXT, FOREIGN KEY (buch_id) REFERENCES buecher(id));",
+        "INSERT INTO ausleihen VALUES (1, 1, 'Anna', '2025-02-01', NULL);",
+        "INSERT INTO ausleihen VALUES (2, 2, 'Bernd', '2025-02-10', '2025-02-20');",
+        "INSERT INTO ausleihen VALUES (3, 3, 'Clara', '2025-01-15', NULL);"
+      ],
+      "gruppe": "bibliothek",
+      "starterCode": "SELECT ...",
+      "loesung": {
+        "typ": "select_compare",
+        "musterloesung": "SELECT b.titel AS Titel, a.ausleiher AS Ausleiher, a.ausleihdatum AS Ausleihdatum, CASE WHEN a.ausleihdatum < '2025-02-15' THEN 'Mahnung' ELSE 'OK' END AS Status FROM ausleihen a JOIN buecher b ON a.buch_id = b.id WHERE a.rückgabedatum IS NULL ORDER BY a.ausleihdatum DESC;",
+        "spaltenReihenfolgeIgnorieren": false,
+        "zeilenReihenfolgeIgnorieren": false
+      }
+    },
+    {
+      "id": "bibliothek-3",
+      "typ": "sql",
+      "schwierigkeit": "schwer",
+      "titel": "Autoren mit mindestens zwei Büchern und Anzahl Ausleihen",
+      "beschreibung": "Aggregation mit HAVING, COUNT, Unterabfragen.",
+      "kontext": "Die Bibliothek will die produktivsten Autoren (mindestens 2 Bücher im Bestand) und sehen, wie oft deren Bücher insgesamt ausgeliehen wurden.",
+      "aufgabenstellung": "Ermitteln Sie alle Autoren, die mindestens 2 Bücher in der Tabelle 'buecher' haben. Geben Sie **Autorenname**, **Anzahl_Bücher** und **Gesamtausleihen** (Anzahl der Ausleihvorgänge über alle deren Bücher) aus. Sortieren Sie absteigend nach Gesamtausleihen.",
+      "hinweise": [
+        "Verwenden Sie LEFT JOIN zwischen Autoren, Büchern und Ausleihen",
+        "Gruppieren Sie nach Autor, dann HAVING COUNT(buecher.id) >= 2",
+        "Zählen Sie Ausleihen mit COUNT(ausleihen.id)"
+      ],
+      "schema": [
+        "CREATE TABLE autoren (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL, geburtsjahr INTEGER);",
+        "INSERT INTO autoren VALUES (1, 'Stephen King', 1947);",
+        "INSERT INTO autoren VALUES (2, 'J.K. Rowling', 1965);",
+        "INSERT INTO autoren VALUES (3, 'Thomas Mann', 1875);",
+        "CREATE TABLE buecher (id INTEGER PRIMARY KEY AUTOINCREMENT, titel TEXT NOT NULL, autor_id INTEGER, jahr INTEGER NOT NULL, FOREIGN KEY (autor_id) REFERENCES autoren(id));",
+        "INSERT INTO buecher VALUES (1, 'The Shining', 1, 1977);",
+        "INSERT INTO buecher VALUES (2, 'Harry Potter 1', 2, 1997);",
+        "INSERT INTO buecher VALUES (3, 'Der Zauberberg', 3, 1924);",
+        "INSERT INTO buecher VALUES (4, 'Es', 1, 1986);",
+        "INSERT INTO buecher VALUES (5, 'Carrie', 1, 1974);",
+        "CREATE TABLE ausleihen (id INTEGER PRIMARY KEY AUTOINCREMENT, buch_id INTEGER, ausleiher TEXT, ausleihdatum TEXT, rückgabedatum TEXT, FOREIGN KEY (buch_id) REFERENCES buecher(id));",
+        "INSERT INTO ausleihen VALUES (1, 1, 'Anna', '2025-02-01', NULL);",
+        "INSERT INTO ausleihen VALUES (2, 2, 'Bernd', '2025-02-10', '2025-02-20');",
+        "INSERT INTO ausleihen VALUES (3, 4, 'Clara', '2025-01-15', NULL);",
+        "INSERT INTO ausleihen VALUES (4, 4, 'Dieter', '2025-02-20', NULL);"
+      ],
+      "gruppe": "bibliothek",
+      "starterCode": "SELECT ...",
+      "loesung": {
+        "typ": "select_compare",
+        "musterloesung": "SELECT a.name AS Autorenname, COUNT(DISTINCT b.id) AS Anzahl_Bücher, COUNT(aus.id) AS Gesamtausleihen FROM autoren a LEFT JOIN buecher b ON a.id = b.autor_id LEFT JOIN ausleihen aus ON b.id = aus.buch_id GROUP BY a.id HAVING COUNT(DISTINCT b.id) >= 2 ORDER BY Gesamtausleihen DESC;",
+        "spaltenReihenfolgeIgnorieren": false,
+        "zeilenReihenfolgeIgnorieren": true
+      }
+    }
+  ]
+}

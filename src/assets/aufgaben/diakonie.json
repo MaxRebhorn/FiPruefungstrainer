@@ -9,6 +9,43 @@
       "id": "diakonie-1",
       "typ": "sql",
       "schwierigkeit": "leicht",
+      "titel": "Alle Ausgaben eines Bereichs anzeigen",
+      "beschreibung": "Einfacher SELECT mit WHERE.",
+      "kontext": "Die Diakonie möchte für den Bereich 'Jugendhilfe' alle erfassten Ausgaben sehen.",
+      "aufgabenstellung": "Zeigen Sie für den Bereich 'Jugendhilfe' (name = 'Jugendhilfe') alle Ausgaben an. Geben Sie **Betrag, Datum und Zweck** aus. Sortieren Sie nach Datum absteigend.",
+      "hinweise": [
+        "Verwenden Sie JOIN zwischen bereiche und ausgaben",
+        "WHERE name = 'Jugendhilfe'"
+      ],
+      "schema": [
+        "CREATE TABLE bereiche (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL, budget REAL NOT NULL);",
+        "INSERT INTO bereiche VALUES (1, 'Jugendhilfe', 50000);",
+        "INSERT INTO bereiche VALUES (2, 'Seniorenarbeit', 45000);",
+        "INSERT INTO bereiche VALUES (3, 'Obdachlosenhilfe', 60000);",
+        "INSERT INTO bereiche VALUES (4, 'Beratungsstelle', 30000);",
+        "CREATE TABLE ausgaben (id INTEGER PRIMARY KEY AUTOINCREMENT, bereich_id INTEGER, betrag REAL NOT NULL, datum TEXT NOT NULL, zweck TEXT, FOREIGN KEY (bereich_id) REFERENCES bereiche(id));",
+        "INSERT INTO ausgaben VALUES (1, 1, 12000, '2025-01-15', 'Personal');",
+        "INSERT INTO ausgaben VALUES (2, 1, 8000, '2025-02-10', 'Material');",
+        "INSERT INTO ausgaben VALUES (3, 2, 25000, '2025-01-20', 'Miete');",
+        "INSERT INTO ausgaben VALUES (4, 2, 5000, '2025-02-05', 'Verpflegung');",
+        "INSERT INTO ausgaben VALUES (5, 3, 18000, '2025-01-25', 'Betreuung');",
+        "INSERT INTO ausgaben VALUES (6, 3, 7000, '2025-02-18', 'Verwaltung');",
+        "INSERT INTO ausgaben VALUES (7, 4, 9000, '2025-01-30', 'Fortbildung');",
+        "INSERT INTO ausgaben VALUES (8, 4, 4000, '2025-02-14', 'Büro');"
+      ],
+      "gruppe": "diakonie",
+      "starterCode": "SELECT ...",
+      "loesung": {
+        "typ": "select_compare",
+        "musterloesung": "SELECT a.betrag, a.datum, a.zweck FROM ausgaben a JOIN bereiche b ON a.bereich_id = b.id WHERE b.name = 'Jugendhilfe' ORDER BY a.datum DESC;",
+        "spaltenReihenfolgeIgnorieren": false,
+        "zeilenReihenfolgeIgnorieren": false
+      }
+    },
+    {
+      "id": "diakonie-2",
+      "typ": "sql",
+      "schwierigkeit": "leicht",
       "titel": "Bereiche mit überdurchschnittlichen Ausgaben",
       "beschreibung": "Einfache Aggregation mit HAVING und Unterabfrage.",
       "kontext": "Die Diakonie möchte ihre sozialen Bereiche (z.B. Jugendhilfe, Seniorenarbeit) analysieren. Für jeden Bereich werden monatlich Ausgaben erfasst. Die Leitung will wissen, welche Bereiche mehr ausgeben als der Durchschnitt aller Bereiche.",
@@ -44,13 +81,88 @@
       }
     },
     {
-      "id": "diakonie-2",
+      "id": "diakonie-3",
+      "typ": "sql",
+      "schwierigkeit": "mittel",
+      "titel": "Budgets der Bereiche mit Ausgaben vergleichen",
+      "beschreibung": "Aggregation mit Vergleich zwischen SUM und budget.",
+      "kontext": "Die Diakonie möchte wissen, welche Bereiche ihr Jahresbudget bereits überschritten haben (nur mit den bisherigen Ausgaben im Januar und Februar).",
+      "aufgabenstellung": "Berechnen Sie für jeden Bereich die Gesamtausgaben (Jan+Feb) und vergleichen Sie mit dem budget. Geben Sie **Bereichsname**, **Budget**, **Gesamtausgaben** und **Differenz** (Budget - Ausgaben) aus. Sortieren Sie nach Differenz aufsteigend (die stärkste Überschreitung zuerst).",
+      "hinweise": [
+        "Verwenden Sie JOIN und GROUP BY",
+        "Differenz = b.budget - SUM(a.betrag)",
+        "Negative Differenz bedeutet Überschreitung"
+      ],
+      "schema": [
+        "CREATE TABLE bereiche (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL, budget REAL NOT NULL);",
+        "INSERT INTO bereiche VALUES (1, 'Jugendhilfe', 50000);",
+        "INSERT INTO bereiche VALUES (2, 'Seniorenarbeit', 45000);",
+        "INSERT INTO bereiche VALUES (3, 'Obdachlosenhilfe', 60000);",
+        "INSERT INTO bereiche VALUES (4, 'Beratungsstelle', 30000);",
+        "CREATE TABLE ausgaben (id INTEGER PRIMARY KEY AUTOINCREMENT, bereich_id INTEGER, betrag REAL NOT NULL, datum TEXT NOT NULL, zweck TEXT, FOREIGN KEY (bereich_id) REFERENCES bereiche(id));",
+        "INSERT INTO ausgaben VALUES (1, 1, 12000, '2025-01-15', 'Personal');",
+        "INSERT INTO ausgaben VALUES (2, 1, 8000, '2025-02-10', 'Material');",
+        "INSERT INTO ausgaben VALUES (3, 2, 25000, '2025-01-20', 'Miete');",
+        "INSERT INTO ausgaben VALUES (4, 2, 5000, '2025-02-05', 'Verpflegung');",
+        "INSERT INTO ausgaben VALUES (5, 3, 18000, '2025-01-25', 'Betreuung');",
+        "INSERT INTO ausgaben VALUES (6, 3, 7000, '2025-02-18', 'Verwaltung');",
+        "INSERT INTO ausgaben VALUES (7, 4, 9000, '2025-01-30', 'Fortbildung');",
+        "INSERT INTO ausgaben VALUES (8, 4, 4000, '2025-02-14', 'Büro');"
+      ],
+      "gruppe": "diakonie",
+      "starterCode": "SELECT ...",
+      "loesung": {
+        "typ": "select_compare",
+        "musterloesung": "SELECT b.name, b.budget, COALESCE(SUM(a.betrag),0) AS Gesamtausgaben, (b.budget - COALESCE(SUM(a.betrag),0)) AS Differenz FROM bereiche b LEFT JOIN ausgaben a ON b.id = a.bereich_id GROUP BY b.id ORDER BY Differenz;",
+        "spaltenReihenfolgeIgnorieren": false,
+        "zeilenReihenfolgeIgnorieren": true
+      }
+    },
+    {
+      "id": "diakonie-4",
+      "typ": "sql",
+      "schwierigkeit": "mittel",
+      "titel": "Monatliche Ausgaben pro Bereich",
+      "beschreibung": "Extraktion von Monat aus Datum, GROUP BY mehreren Spalten.",
+      "kontext": "Die Diakonie möchte einen monatlichen Vergleich der Ausgaben pro Bereich sehen, um Saisonalitäten zu erkennen.",
+      "aufgabenstellung": "Geben Sie für jeden Bereich und Monat (extrahiert aus `datum` als 'YYYY-MM') die **Gesamtausgaben** aus. Sortieren Sie nach Bereichsname und Monat.",
+      "hinweise": [
+        "Verwenden Sie `SUBSTR(datum, 1, 7)` um Jahr-Monat zu extrahieren",
+        "GROUP BY bereich_id, Monat"
+      ],
+      "schema": [
+        "CREATE TABLE bereiche (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL, budget REAL NOT NULL);",
+        "INSERT INTO bereiche VALUES (1, 'Jugendhilfe', 50000);",
+        "INSERT INTO bereiche VALUES (2, 'Seniorenarbeit', 45000);",
+        "INSERT INTO bereiche VALUES (3, 'Obdachlosenhilfe', 60000);",
+        "INSERT INTO bereiche VALUES (4, 'Beratungsstelle', 30000);",
+        "CREATE TABLE ausgaben (id INTEGER PRIMARY KEY AUTOINCREMENT, bereich_id INTEGER, betrag REAL NOT NULL, datum TEXT NOT NULL, zweck TEXT, FOREIGN KEY (bereich_id) REFERENCES bereiche(id));",
+        "INSERT INTO ausgaben VALUES (1, 1, 12000, '2025-01-15', 'Personal');",
+        "INSERT INTO ausgaben VALUES (2, 1, 8000, '2025-02-10', 'Material');",
+        "INSERT INTO ausgaben VALUES (3, 2, 25000, '2025-01-20', 'Miete');",
+        "INSERT INTO ausgaben VALUES (4, 2, 5000, '2025-02-05', 'Verpflegung');",
+        "INSERT INTO ausgaben VALUES (5, 3, 18000, '2025-01-25', 'Betreuung');",
+        "INSERT INTO ausgaben VALUES (6, 3, 7000, '2025-02-18', 'Verwaltung');",
+        "INSERT INTO ausgaben VALUES (7, 4, 9000, '2025-01-30', 'Fortbildung');",
+        "INSERT INTO ausgaben VALUES (8, 4, 4000, '2025-02-14', 'Büro');"
+      ],
+      "gruppe": "diakonie",
+      "starterCode": "SELECT ...",
+      "loesung": {
+        "typ": "select_compare",
+        "musterloesung": "SELECT b.name AS Bereichsname, SUBSTR(a.datum, 1, 7) AS Monat, SUM(a.betrag) AS Gesamtausgaben FROM bereiche b JOIN ausgaben a ON b.id = a.bereich_id GROUP BY b.id, Monat ORDER BY b.name, Monat;",
+        "spaltenReihenfolgeIgnorieren": false,
+        "zeilenReihenfolgeIgnorieren": true
+      }
+    },
+    {
+      "id": "diakonie-5",
       "typ": "sql",
       "schwierigkeit": "schwer",
       "titel": "Sparpotenzial durch Personalauslastung",
       "beschreibung": "Mehrere JOINs, CASE, Fensterfunktionen (oder Subqueries).",
       "kontext": "Um zu sparen, möchte die Diakonie Personalausgaben mit der Anzahl der betreuten Personen in Relation setzen. Bereiche mit niedriger Auslastung (wenig betreute Personen pro Mitarbeiter) sind ineffizient.",
-      "aufgabenstellung": "Berechnen Sie für jeden Bereich die **Anzahl der Mitarbeiter** (Tabelle `personal`), die **Summe der Personalkosten** (aus `ausgaben` mit zweck = 'Personal') und die **Anzahl der betreuten Personen** (Tabelle `betreuung`).  \nErmitteln Sie dann die **Kosten pro betreuter Person** und kennzeichnen Sie Bereiche mit einem **Effizienzlabel**:  \n- 'Grün' wenn Kosten pro Person < 1000  \n- 'Gelb' wenn zwischen 1000 und 2000  \n- 'Rot' wenn > 2000  \nGeben Sie aus: Bereichsname, Kosten_pro_Person, Label. Sortieren Sie nach Kosten absteigend.",
+      "aufgabenstellung": "Berechnen Sie für jeden Bereich die Anzahl der Mitarbeiter (Tabelle `personal`), die Summe der Personalkosten (aus `ausgaben` mit zweck = 'Personal') und die Anzahl der betreuten Personen (Tabelle `betreuung`).\\nErmitteln Sie dann die Kosten pro betreuter Person und kennzeichnen Sie Bereiche mit einem Effizienzlabel:\\n- 'Grün' wenn Kosten pro Person < 1000\\n- 'Gelb' wenn zwischen 1000 und 2000\\n- 'Rot' wenn > 2000\\nGeben Sie aus: Bereichsname, Kosten_pro_Person, Label. Sortieren Sie nach Kosten absteigend.",
       "hinweise": [
         "Nutzen Sie LEFT JOIN, da möglicherweise keine Betreuung oder kein Personal vorhanden ist",
         "Verwenden Sie CASE für das Label",

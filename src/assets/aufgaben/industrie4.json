@@ -8,6 +8,44 @@
     {
       "id": "industrie4-1",
       "typ": "javascript",
+      "schwierigkeit": "leicht",
+      "titel": "Produktionsmenge berechnen",
+      "beschreibung": "Einfache Funktion mit Schleife und Produktionsfaktor.",
+      "kontext": "Eine Maschine produziert pro Stunde eine bestimmte Stückzahl. Die Effizienz sinkt mit jeder weiteren Stunde um 2% (multiplikativ). Die Funktion soll die Gesamtproduktion nach einer gegebenen Anzahl Stunden berechnen.",
+      "aufgabenstellung": "Implementieren Sie `berechneProduktion(stunden, startRate)`.\n- `stunden` = Anzahl Stunden (ganze Zahl)\n- `startRate` = Stückzahl pro Stunde zu Beginn\n- Jede weitere Stunde produziert nur noch 98% der vorherigen Stunde (Startstunde 100%).\n- Geben Sie die Gesamtstückzahl (Summe über alle Stunden) zurück. Runden Sie auf ganze Zahlen (Math.floor).",
+      "hinweise": [
+        "Verwenden Sie eine Schleife von 0 bis stunden-1",
+        "Produktion pro Stunde = startRate * (0.98 ** stunde)",
+        "Aufsummieren und am Ende Math.floor"
+      ],
+      "schema": [],
+      "gruppe": "industrie4",
+      "starterCode": "function berechneProduktion(stunden, startRate) {\n  // Dein Code hier\n}",
+      "loesung": {
+        "typ": "function_tests",
+        "funktionsname": "berechneProduktion",
+        "testfaelle": [
+          {
+            "beschreibung": "3 Stunden, Start 100 Stück/h",
+            "setup": "return [3, 100];",
+            "erwartet": 294
+          },
+          {
+            "beschreibung": "1 Stunde, Start 50",
+            "setup": "return [1, 50];",
+            "erwartet": 50
+          },
+          {
+            "beschreibung": "10 Stunden, Start 10",
+            "setup": "return [10, 10];",
+            "erwartet": 89
+          }
+        ]
+      }
+    },
+    {
+      "id": "industrie4-2",
+      "typ": "javascript",
       "schwierigkeit": "mittel",
       "titel": "Gesamteffizienz der Fertigungslinie berechnen",
       "beschreibung": "Mehrere Maschinen liefern Wirkungsgrade – eine Funktion kombiniert diese zu einem Gesamtwert.",
@@ -39,40 +77,6 @@
             "beschreibung": "Begrenzung unten: extrem schlechte Werte, alter=20 -> produkt=0.2 -> 20% -2% =18%",
             "setup": "return [[0.5, 0.4, 1.0], 20];",
             "erwartet": 18
-          }
-        ]
-      }
-    },
-    {
-      "id": "industrie4-2",
-      "typ": "javascript",
-      "schwierigkeit": "schwer",
-      "titel": "Wartungsplaner – nächsten Termin berechnen",
-      "beschreibung": "Berechnung des nächsten Wartungstermins basierend auf Laufzeit und Schichtbetrieb.",
-      "kontext": "Jede Maschine hat eine maximale Betriebsstundenzahl bis zur Wartung. Die tatsächliche Laufzeit pro Tag hängt von der Schichtzahl ab. Die Firma möchte eine Funktion, die aus den aktuellen Gesamtlaufstunden die Reststunden und den voraussichtlichen Wartungstermin berechnet.",
-      "aufgabenstellung": "Implementieren Sie die Funktion `naechsteWartung(aktuelleStunden, maxStunden, schichtenProTag, startDatum)`.  \n- `schichtenProTag`: 1, 2 oder 3 (jede Schicht = 8 Stunden).  \n- `startDatum`: ein Date-Objekt, ab dem weitergerechnet wird.  \nDie Funktion soll ein Date-Objekt zurückgeben, an dem die `maxStunden` erreicht oder überschritten werden.  \nGehen Sie von einem kontinuierlichen Betrieb (7 Tage/Woche) aus. Runden Sie den Termin auf den nächsten ganzen Tag (00:00 Uhr).",
-      "hinweise": [
-        "Berechnen Sie die verbleibenden Stunden: `rest = maxStunden - aktuelleStunden`",
-        "Stunden pro Tag = `schichtenProTag * 8`",
-        "Tage bis Wartung = `Math.ceil(rest / stundenProTag)`",
-        "Mit `startDatum.setDate(startDatum.getDate() + tage)` den Termin ermitteln"
-      ],
-      "schema": [],
-      "gruppe": "industrie4",
-      "starterCode": "function naechsteWartung(aktuelleStunden, maxStunden, schichtenProTag, startDatum) {\n  // Dein Code hier\n}",
-      "loesung": {
-        "typ": "function_tests",
-        "funktionsname": "naechsteWartung",
-        "testfaelle": [
-          {
-            "beschreibung": "Rest 50 Stunden, 2 Schichten/Tag (16h) -> 4 Tage (ceil 50/16=3,125 → 4)",
-            "setup": "return [950, 1000, 2, new Date('2025-03-10')];",
-            "erwartet": "2025-03-14T00:00:00.000Z"
-          },
-          {
-            "beschreibung": "Genau 48h Rest, 3 Schichten (24h) -> 2 Tage",
-            "setup": "return [2000, 2048, 3, new Date('2025-03-01')];",
-            "erwartet": "2025-03-03T00:00:00.000Z"
           }
         ]
       }
@@ -111,6 +115,74 @@
         "musterloesung": "SELECT m.name AS Maschinenname, SUM(s.dauer_minuten) AS Gesamtausfall FROM stillstaende s JOIN maschinen m ON s.maschine_id = m.id WHERE s.startzeit BETWEEN '2025-03-01' AND '2025-03-31 23:59:59' GROUP BY m.name ORDER BY Gesamtausfall DESC;",
         "spaltenReihenfolgeIgnorieren": false,
         "zeilenReihenfolgeIgnorieren": true
+      }
+    },
+    {
+      "id": "industrie4-4",
+      "typ": "sql",
+      "schwierigkeit": "mittel",
+      "titel": "Maschinen mit den meisten Stillständen",
+      "beschreibung": "COUNT und GROUP BY, Sortierung.",
+      "kontext": "Die Wartungsabteilung möchte wissen, welche Maschinen die meisten Ausfälle (Anzahl der Stillstände) haben, unabhängig von der Dauer.",
+      "aufgabenstellung": "Zählen Sie für jede Maschine die Anzahl der Stillstände. Geben Sie **Maschinenname** und **Anzahl_Stillstaende** aus. Sortieren Sie absteigend nach Anzahl. Berücksichtigen Sie alle Stillstände (keine Datumseinschränkung).",
+      "hinweise": [
+        "Verwenden Sie JOIN und COUNT(*)",
+        "GROUP BY maschine_id"
+      ],
+      "schema": [
+        "CREATE TABLE maschinen (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL, typ TEXT NOT NULL);",
+        "INSERT INTO maschinen VALUES (1, 'Fräsmaschine HD300', 'CNC');",
+        "INSERT INTO maschinen VALUES (2, 'Laser cutter', 'Laser');",
+        "INSERT INTO maschinen VALUES (3, 'Montageroboter R5', 'Roboter');",
+        "CREATE TABLE stillstaende (id INTEGER PRIMARY KEY AUTOINCREMENT, maschine_id INTEGER, dauer_minuten INTEGER NOT NULL, startzeit TEXT NOT NULL, grund TEXT, FOREIGN KEY (maschine_id) REFERENCES maschinen(id));",
+        "INSERT INTO stillstaende VALUES (1, 1, 45, '2025-03-02 08:00:00', 'Werkzeugbruch');",
+        "INSERT INTO stillstaende VALUES (2, 1, 120, '2025-03-15 13:30:00', 'Stromausfall');",
+        "INSERT INTO stillstaende VALUES (3, 2, 30, '2025-03-10 09:15:00', 'Kühlung defekt');",
+        "INSERT INTO stillstaende VALUES (4, 3, 15, '2025-03-20 10:00:00', 'Sensor Fehler');",
+        "INSERT INTO stillstaende VALUES (5, 3, 200, '2025-02-28 22:00:00', 'Defekt (Februar)');",
+        "INSERT INTO stillstaende VALUES (6, 2, 10, '2025-03-30 14:00:00', 'Justage');"
+      ],
+      "gruppe": "industrie4",
+      "starterCode": "SELECT ...",
+      "loesung": {
+        "typ": "select_compare",
+        "musterloesung": "SELECT m.name AS Maschinenname, COUNT(*) AS Anzahl_Stillstaende FROM stillstaende s JOIN maschinen m ON s.maschine_id = m.id GROUP BY m.name ORDER BY Anzahl_Stillstaende DESC;",
+        "spaltenReihenfolgeIgnorieren": false,
+        "zeilenReihenfolgeIgnorieren": true
+      }
+    },
+    {
+      "id": "industrie4-5",
+      "typ": "javascript",
+      "schwierigkeit": "schwer",
+      "titel": "Wartungsplaner – nächsten Termin berechnen",
+      "beschreibung": "Berechnung des nächsten Wartungstermins basierend auf Laufzeit und Schichtbetrieb.",
+      "kontext": "Jede Maschine hat eine maximale Betriebsstundenzahl bis zur Wartung. Die tatsächliche Laufzeit pro Tag hängt von der Schichtzahl ab. Die Firma möchte eine Funktion, die aus den aktuellen Gesamtlaufstunden die Reststunden und den voraussichtlichen Wartungstermin berechnet.",
+      "aufgabenstellung": "Implementieren Sie die Funktion `naechsteWartung(aktuelleStunden, maxStunden, schichtenProTag, startDatum)`.\n- `schichtenProTag`: 1, 2 oder 3 (jede Schicht = 8 Stunden).\n- `startDatum`: ein Date-Objekt, ab dem weitergerechnet wird.\nDie Funktion soll ein Date-Objekt zurückgeben, an dem die `maxStunden` erreicht oder überschritten werden.\nGehen Sie von einem kontinuierlichen Betrieb (7 Tage/Woche) aus. Runden Sie den Termin auf den nächsten ganzen Tag (00:00 Uhr).",
+      "hinweise": [
+        "Berechnen Sie die verbleibenden Stunden: `rest = maxStunden - aktuelleStunden`",
+        "Stunden pro Tag = `schichtenProTag * 8`",
+        "Tage bis Wartung = `Math.ceil(rest / stundenProTag)`",
+        "Mit `startDatum.setDate(startDatum.getDate() + tage)` den Termin ermitteln"
+      ],
+      "schema": [],
+      "gruppe": "industrie4",
+      "starterCode": "function naechsteWartung(aktuelleStunden, maxStunden, schichtenProTag, startDatum) {\n  // Dein Code hier\n}",
+      "loesung": {
+        "typ": "function_tests",
+        "funktionsname": "naechsteWartung",
+        "testfaelle": [
+          {
+            "beschreibung": "Rest 50 Stunden, 2 Schichten/Tag (16h) -> 4 Tage (ceil 50/16=3,125 → 4)",
+            "setup": "return [950, 1000, 2, new Date('2025-03-10')];",
+            "erwartet": "2025-03-14T00:00:00.000Z"
+          },
+          {
+            "beschreibung": "Genau 48h Rest, 3 Schichten (24h) -> 2 Tage",
+            "setup": "return [2000, 2048, 3, new Date('2025-03-01')];",
+            "erwartet": "2025-03-03T00:00:00.000Z"
+          }
+        ]
       }
     }
   ]
