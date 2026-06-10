@@ -1,6 +1,7 @@
 <template>
   <header class="app-header">
     <div class="header-left">
+      <button @click="$emit('toggle-sidebar')" class="menu-btn" title="Menü">☰</button>
       <router-link to="/" class="logo">IHK Aufgabenplattform</router-link>
     </div>
     <nav class="header-nav">
@@ -17,6 +18,10 @@
 
 <script setup lang="ts">
 import { ref } from "vue";
+
+defineEmits<{
+  "toggle-sidebar": [];
+}>();
 
 const isDark = ref(document.documentElement.getAttribute("data-theme") !== "light");
 
@@ -35,6 +40,29 @@ function toggleTheme() {
   height: 56px;
   background: var(--color-surface);
   border-bottom: 1px solid var(--color-border);
+  flex-shrink: 0;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.menu-btn {
+  display: none;
+  background: transparent;
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  padding: 4px 8px;
+  cursor: pointer;
+  font-size: 18px;
+  color: var(--color-text);
+  line-height: 1;
+}
+
+.menu-btn:hover {
+  background: var(--color-border);
 }
 
 .logo {
@@ -72,5 +100,24 @@ function toggleTheme() {
   padding: 6px 10px;
   cursor: pointer;
   font-size: 16px;
+}
+
+@media (max-width: 768px) {
+  .app-header {
+    padding: 0 12px;
+  }
+
+  .menu-btn {
+    display: block;
+  }
+
+  .header-nav {
+    gap: 8px;
+  }
+
+  .nav-link {
+    font-size: 13px;
+    padding: 6px 8px;
+  }
 }
 </style>

@@ -89,6 +89,22 @@ const taskStore = useTaskStore();
   flex-shrink: 0;
 }
 
+@media (max-width: 768px) {
+  .sidebar {
+    position: fixed;
+    left: -280px;
+    top: 56px;
+    bottom: 0;
+    z-index: 100;
+    transition: left 0.25s ease;
+    box-shadow: var(--shadow);
+  }
+
+  .sidebar.sidebar-open {
+    left: 0;
+  }
+}
+
 .sidebar-section {
   margin-bottom: 24px;
 }

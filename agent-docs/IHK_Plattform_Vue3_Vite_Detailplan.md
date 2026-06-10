@@ -1771,10 +1771,10 @@ npm run build
 25. ✅ Edge Cases testen (Fehlerbehandlung, Timeouts)
 
 ### Phase 7: Polish (1–2h)
-26. ⏳ Dark/Light Mode Toggle
-27. ⏳ Mobile Responsive Layout
-28. ⏳ Upload-Modal für Custom Tasks
-29. ⏳ Export/Import Funktionalität
+26. ✅ Dark/Light Mode Toggle
+27. ✅ Mobile Responsive Layout (Sidebar-Toggle, @media queries, responsive grid)
+28. ✅ Upload-Modal für Custom Tasks
+29. ✅ Export-Funktionalität (JSON-Download in ProgressView)
 
 ---
 

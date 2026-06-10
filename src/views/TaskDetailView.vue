@@ -92,6 +92,10 @@ const statusLabel = computed(() => {
 });
 
 onMounted(async () => {
+  // Ensure tasks are loaded (important when navigating directly to detail)
+  if (taskStore.allTasks.length === 0) {
+    await taskStore.loadTasks();
+  }
   await progressStore.loadProgress();
   await editorStore.loadCode(taskId);
 });
@@ -286,5 +290,29 @@ async function handleExecute(code: string) {
 
 .back-link:hover {
   text-decoration: underline;
+}
+
+@media (max-width: 768px) {
+  .task-detail {
+    padding: 0;
+  }
+
+  .task-content {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .left-panel {
+    max-height: 50vh;
+    padding-right: 0;
+  }
+
+  .context-block {
+    padding: 16px;
+  }
+
+  .context-block h1 {
+    font-size: 20px;
+  }
 }
 </style>

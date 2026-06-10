@@ -1,6 +1,11 @@
 <template>
   <div class="progress-view">
-    <h1>Fortschritt</h1>
+    <div class="page-header">
+      <h1>Fortschritt</h1>
+      <div class="header-actions">
+        <button @click="handleExport" class="btn-export">📥 Exportieren</button>
+      </div>
+    </div>
 
     <div v-if="!loaded" class="state-message">
       Lade Statistiken...
@@ -99,6 +104,7 @@
 import { computed, onMounted, ref } from "vue";
 import { useTaskStore } from "@/stores/taskStore";
 import { useProgressStore } from "@/stores/progressStore";
+import { storage } from "@/core/storage";
 
 const taskStore = useTaskStore();
 const progressStore = useProgressStore();
@@ -163,6 +169,21 @@ function diffPercent(diff: "leicht" | "mittel" | "schwer"): number {
   const b = breakdown.value.byDifficulty[diff];
   return b.gesamt > 0 ? Math.round((b.geloest / b.gesamt) * 100) : 0;
 }
+
+async function handleExport() {
+  try {
+    const data = await storage.exportAll();
+    const blob = new Blob([data], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `ihk-fortschritt-${new Date().toISOString().slice(0, 10)}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+  } catch (err: any) {
+    console.error("Export failed:", err);
+  }
+}
 </script>
 
 <style scoped>
@@ -171,10 +192,38 @@ function diffPercent(diff: "leicht" | "mittel" | "schwer"): number {
   margin: 0 auto;
 }
 
-.progress-view h1 {
-  margin: 0 0 24px;
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.page-header h1 {
+  margin: 0;
   font-size: 24px;
   font-weight: 700;
+}
+
+.header-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.btn-export {
+  padding: 8px 16px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  color: var(--color-text);
+  cursor: pointer;
+  font-size: 14px;
+  font-family: inherit;
+}
+
+.btn-export:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
 }
 
 .state-message {
@@ -302,5 +351,24 @@ function diffPercent(diff: "leicht" | "mittel" | "schwer"): number {
   color: var(--color-text-muted);
   font-size: 12px;
   margin-left: 4px;
+}
+
+@media (max-width: 768px) {
+  .page-header h1 {
+    font-size: 20px;
+  }
+
+  .summary-cards {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+
+  .summary-card {
+    padding: 16px;
+  }
+
+  .card-value {
+    font-size: 24px;
+  }
 }
 </style>

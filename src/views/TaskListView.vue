@@ -121,4 +121,15 @@ onMounted(() => {
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   gap: 16px;
 }
+
+@media (max-width: 768px) {
+  .page-header h1 {
+    font-size: 20px;
+  }
+
+  .task-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+}
 </style>
