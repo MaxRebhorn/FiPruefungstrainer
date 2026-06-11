@@ -8,7 +8,7 @@ import "./assets/styles/theme.css";
 
 // Initialize sql.js WASM for SQL validation (non-blocking — app mounts immediately)
 initSqlJs({
-  locateFile: (file: string) => `/sql-wasm.wasm`,
+  locateFile: (file: string) => `${import.meta.env.BASE_URL}${file}`,
 }).then((SQL: any) => {
   window._SQL = SQL;
 });

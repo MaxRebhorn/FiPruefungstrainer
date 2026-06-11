@@ -3,7 +3,7 @@ import { storage } from "./storage";
 
 // Dynamisch alle JSON-Aufgabendateien im assets/aufgaben/ Verzeichnis erkennen
 const aufgabenModules = import.meta.glob<{ default: TaskSet }>(
-  "/src/assets/aufgaben/*.json",
+  "/src/assets/aufgaben/!(aufgaben-schema).json",
   { eager: true }
 );
 

@@ -38,7 +38,7 @@
           {
             "beschreibung": "10 Stunden, Start 10",
             "setup": "return [10, 10];",
-            "erwartet": 89
+            "erwartet": 91
           }
         ]
       }
